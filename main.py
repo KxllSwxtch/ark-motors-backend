@@ -329,3 +329,61 @@ def cars(
         detailSearch,
         type_,
     )
+
+
+@app.get("/car-details")
+def car_details(carId: str = Query(..., description="ID автомобиля")):
+    url = f"https://www.arkmotors.kr/search/detail/{carId}"
+    headers = {
+        "Content-Type": "text/html; charset=UTF-8",
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36",
+    }
+    response = requests.get(url, headers=headers)
+    content = response.text
+
+    soup = BeautifulSoup(content, "html.parser")
+    # Получаем название автомобиля
+    car_name_element = soup.select_one(".car_name p")
+    carName = car_name_element.text.strip() if car_name_element else ""
+
+    # Парсим таблицу с базовой информацией
+    basic_info = soup.select_one(".info_wrap .basic-info")
+
+    car_info = {}
+    if basic_info:
+        rows = basic_info.find_all("tr")
+        for row in rows:
+            columns = row.find_all(["th", "td"])
+            if len(columns) == 4:
+                key1 = columns[0].get_text(strip=True)
+                value1 = columns[1].get_text(strip=True)
+                key2 = columns[2].get_text(strip=True)
+                value2 = columns[3].get_text(strip=True)
+                car_info[key1] = value1
+                car_info[key2] = value2
+            elif len(columns) == 2:
+                key = columns[0].get_text(strip=True)
+                value = columns[1].get_text(strip=True)
+                car_info[key] = value
+
+    # Удаляем ненужное поле, если оно присутствует
+    car_info.pop("사고유무", None)
+
+    return {"carName": carName, "carData": car_info}
+
+
+@app.get("/car-images")
+def car_images(carId: str = Query(..., description="ID автомобиля")):
+    url = "https://www.arkmotors.kr/search/imageList"
+    payload = {"carNo": carId}
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36",
+    }
+    response = requests.post(url, data=payload, headers=headers)
+    content = response.json()
+    images = [
+        {"full": img.get("CarImageFullName"), "thumb": img.get("CarImageThumb")}
+        for img in content.get("info", [])
+    ]
+    return {"images": images}
