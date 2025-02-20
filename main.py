@@ -369,6 +369,14 @@ def car_details(carId: str = Query(..., description="ID автомобиля")):
     # Удаляем ненужное поле, если оно присутствует
     car_info.pop("사고유무", None)
 
+    # Вытаскиываем цену автомобиля
+    car_price = soup.select_one(".car_right_side .car_price")
+    if car_price:
+        car_price = re.sub(r"\D", "", car_price.text)
+        car_price = int(car_price) * 10000
+
+    car_info["price"] = car_price
+
     return {"carName": carName, "carData": car_info}
 
 
