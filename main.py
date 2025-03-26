@@ -25,9 +25,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+PROXIES = {
+    "http": "http://B01vby:GBno0x@45.118.250.2:8000",
+    "https": "http://B01vby:GBno0x@45.118.250.2:8000",
+}
+
 
 def get_maker_list(country: str):
-    url = "https://corsproxy.io/?url=https://www.arkmotors.kr/search/getMakerList"
+    url = "https://www.arkmotors.kr/search/getMakerList"
     payload = {"country": country}
     headers = {
         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
@@ -40,13 +45,13 @@ def get_maker_list(country: str):
         "X-Requested-With": "XMLHttpRequest",
         "Connection": "keep-alive",
     }
-    response = requests.post(url, headers=headers, data=payload)
+    response = requests.post(url, headers=headers, data=payload, proxies=PROXIES)
     content = response.json()
     return content.get("data", [])
 
 
 def get_model_list(maker: str):
-    url = "https://corsproxy.io/?url=https://www.arkmotors.kr/search/getModelList"
+    url = "https://www.arkmotors.kr/search/getModelList"
     payload = {"maker": maker}
     headers = {
         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
@@ -59,13 +64,13 @@ def get_model_list(maker: str):
         "X-Requested-With": "XMLHttpRequest",
         "Connection": "keep-alive",
     }
-    response = requests.post(url, headers=headers, data=payload)
+    response = requests.post(url, headers=headers, data=payload, proxies=PROXIES)
     content = response.json()
     return content.get("data", [])
 
 
 def get_detail_model_list(model: str):
-    url = "https://corsproxy.io/?url=https://www.arkmotors.kr/search/getDetailModelList"
+    url = "https://www.arkmotors.kr/search/getDetailModelList"
     payload = {"model": model}
     headers = {
         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
@@ -78,13 +83,13 @@ def get_detail_model_list(model: str):
         "X-Requested-With": "XMLHttpRequest",
         "Connection": "keep-alive",
     }
-    response = requests.post(url, headers=headers, data=payload)
+    response = requests.post(url, headers=headers, data=payload, proxies=PROXIES)
     content = response.json()
     return content.get("data", [])
 
 
 def get_grade_list(detail_model: str):
-    url = "https://corsproxy.io/?url=https://www.arkmotors.kr/search/getGradeList"
+    url = "https://www.arkmotors.kr/search/getGradeList"
     payload = {"detail-model": detail_model}
     headers = {
         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
@@ -97,13 +102,13 @@ def get_grade_list(detail_model: str):
         "X-Requested-With": "XMLHttpRequest",
         "Connection": "keep-alive",
     }
-    response = requests.post(url, headers=headers, data=payload)
+    response = requests.post(url, headers=headers, data=payload, proxies=PROXIES)
     content = response.json()
     return content.get("data", [])
 
 
 def get_detail_grade_list(grade: str):
-    url = "https://corsproxy.io/?url=https://www.arkmotors.kr/search/getDetailGradeList"
+    url = "https://www.arkmotors.kr/search/getDetailGradeList"
     payload = {"grade": grade}
     headers = {
         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
@@ -116,7 +121,7 @@ def get_detail_grade_list(grade: str):
         "X-Requested-With": "XMLHttpRequest",
         "Connection": "keep-alive",
     }
-    response = requests.post(url, headers=headers, data=payload)
+    response = requests.post(url, headers=headers, data=payload, proxies=PROXIES)
     content = response.json()
     return content.get("data", [])
 
@@ -152,7 +157,7 @@ def fetch_cars(
     detailSearch: str = "close",
     type_: str = "",
 ):
-    base_url = f"https://corsproxy.io/?url=https://www.arkmotors.kr/search/model/{country}/{page}"
+    base_url = f"https://www.arkmotors.kr/search/model/{country}/{page}"
     params = {
         "order": order,
         "ascending": ascending,
@@ -195,7 +200,7 @@ def fetch_cars(
         "Connection": "keep-alive",
     }
 
-    response = requests.get(base_url, headers=headers, params=params)
+    response = requests.get(base_url, headers=headers, params=params, proxies=PROXIES)
     content = response.text
 
     soup = BeautifulSoup(content, "html.parser")
@@ -359,12 +364,12 @@ def cars(
 
 @app.get("/car-details")
 def car_details(carId: str = Query(..., description="ID автомобиля")):
-    url = f"https://corsproxy.io/?url=https://www.arkmotors.kr/search/detail/{carId}"
+    url = f"https://www.arkmotors.kr/search/detail/{carId}"
     headers = {
         "Content-Type": "text/html; charset=UTF-8",
         "User-Agent": random.choice(USER_AGENTS),
     }
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, headers=headers, proxies=PROXIES)
     content = response.text
 
     soup = BeautifulSoup(content, "html.parser")
@@ -408,7 +413,7 @@ def car_details(carId: str = Query(..., description="ID автомобиля")):
 
 @app.get("/car-images")
 def car_images(carId: str = Query(..., description="ID автомобиля")):
-    url = "https://corsproxy.io/?url=https://www.arkmotors.kr/search/imageList"
+    url = "https://www.arkmotors.kr/search/imageList"
     payload = {"carNo": carId}
     headers = {
         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
@@ -421,7 +426,7 @@ def car_images(carId: str = Query(..., description="ID автомобиля")):
         "X-Requested-With": "XMLHttpRequest",
         "Connection": "keep-alive",
     }
-    response = requests.post(url, data=payload, headers=headers)
+    response = requests.post(url, data=payload, headers=headers, proxies=PROXIES)
     content = response.json()
     images = [
         {"full": img.get("CarImageFullName"), "thumb": img.get("CarImageThumb")}
