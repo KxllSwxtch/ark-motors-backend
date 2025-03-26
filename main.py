@@ -408,7 +408,13 @@ def car_details(carId: str = Query(..., description="ID автомобиля")):
 
     car_info["price"] = car_price
 
-    return {"carName": carName, "carData": car_info}
+    # Получаем ссылку на историю автомобиля
+    history_elem = soup.select_one("div#tab-add-option-info > div > a")
+    car_history_url = (
+        history_elem["href"] if history_elem and history_elem.has_attr("href") else ""
+    )
+
+    return {"carName": carName, "carData": car_info, "carHistoryURL": car_history_url}
 
 
 @app.get("/car-images")
