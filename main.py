@@ -1,17 +1,25 @@
 import re
 import html
 import requests
+import random
 from bs4 import BeautifulSoup
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 
 
 app = FastAPI()
+USER_AGENTS = [
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Safari/605.1.15",
+    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36",
+    "Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Mobile/15E148 Safari/604.1",
+    "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36",
+]
 
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # или список конкретных доменов
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -23,11 +31,14 @@ def get_maker_list(country: str):
     payload = {"country": country}
     headers = {
         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-        "User-Agent": (
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/133.0.0.0 Safari/537.36"
-        ),
+        "User-Agent": random.choice(USER_AGENTS),
+        "Accept": "application/json, text/javascript, */*; q=0.01",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Origin": "https://www.arkmotors.kr",
+        "Referer": "https://www.arkmotors.kr/",
+        "X-Requested-With": "XMLHttpRequest",
+        "Connection": "keep-alive",
     }
     response = requests.post(url, headers=headers, data=payload)
     content = response.json()
@@ -39,11 +50,14 @@ def get_model_list(maker: str):
     payload = {"maker": maker}
     headers = {
         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-        "User-Agent": (
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/133.0.0.0 Safari/537.36"
-        ),
+        "User-Agent": random.choice(USER_AGENTS),
+        "Accept": "application/json, text/javascript, */*; q=0.01",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Origin": "https://www.arkmotors.kr",
+        "Referer": "https://www.arkmotors.kr/",
+        "X-Requested-With": "XMLHttpRequest",
+        "Connection": "keep-alive",
     }
     response = requests.post(url, headers=headers, data=payload)
     content = response.json()
@@ -55,11 +69,14 @@ def get_detail_model_list(model: str):
     payload = {"model": model}
     headers = {
         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-        "User-Agent": (
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/133.0.0.0 Safari/537.36"
-        ),
+        "User-Agent": random.choice(USER_AGENTS),
+        "Accept": "application/json, text/javascript, */*; q=0.01",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Origin": "https://www.arkmotors.kr",
+        "Referer": "https://www.arkmotors.kr/",
+        "X-Requested-With": "XMLHttpRequest",
+        "Connection": "keep-alive",
     }
     response = requests.post(url, headers=headers, data=payload)
     content = response.json()
@@ -71,11 +88,14 @@ def get_grade_list(detail_model: str):
     payload = {"detail-model": detail_model}
     headers = {
         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-        "User-Agent": (
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/133.0.0.0 Safari/537.36"
-        ),
+        "User-Agent": random.choice(USER_AGENTS),
+        "Accept": "application/json, text/javascript, */*; q=0.01",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Origin": "https://www.arkmotors.kr",
+        "Referer": "https://www.arkmotors.kr/",
+        "X-Requested-With": "XMLHttpRequest",
+        "Connection": "keep-alive",
     }
     response = requests.post(url, headers=headers, data=payload)
     content = response.json()
@@ -87,11 +107,14 @@ def get_detail_grade_list(grade: str):
     payload = {"grade": grade}
     headers = {
         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-        "User-Agent": (
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/133.0.0.0 Safari/537.36"
-        ),
+        "User-Agent": random.choice(USER_AGENTS),
+        "Accept": "application/json, text/javascript, */*; q=0.01",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Origin": "https://www.arkmotors.kr",
+        "Referer": "https://www.arkmotors.kr/",
+        "X-Requested-With": "XMLHttpRequest",
+        "Connection": "keep-alive",
     }
     response = requests.post(url, headers=headers, data=payload)
     content = response.json()
@@ -162,11 +185,14 @@ def fetch_cars(
     }
     headers = {
         "Content-Type": "text/html; charset=UTF-8",
-        "User-Agent": (
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/133.0.0.0 Safari/537.36"
-        ),
+        "User-Agent": random.choice(USER_AGENTS),
+        "Accept": "application/json, text/javascript, */*; q=0.01",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Origin": "https://www.arkmotors.kr",
+        "Referer": "https://www.arkmotors.kr/",
+        "X-Requested-With": "XMLHttpRequest",
+        "Connection": "keep-alive",
     }
 
     response = requests.get(base_url, headers=headers, params=params)
@@ -336,7 +362,7 @@ def car_details(carId: str = Query(..., description="ID автомобиля")):
     url = f"https://www.arkmotors.kr/search/detail/{carId}"
     headers = {
         "Content-Type": "text/html; charset=UTF-8",
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36",
+        "User-Agent": random.choice(USER_AGENTS),
     }
     response = requests.get(url, headers=headers)
     content = response.text
@@ -386,7 +412,14 @@ def car_images(carId: str = Query(..., description="ID автомобиля")):
     payload = {"carNo": carId}
     headers = {
         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36",
+        "User-Agent": random.choice(USER_AGENTS),
+        "Accept": "application/json, text/javascript, */*; q=0.01",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Origin": "https://www.arkmotors.kr",
+        "Referer": "https://www.arkmotors.kr/",
+        "X-Requested-With": "XMLHttpRequest",
+        "Connection": "keep-alive",
     }
     response = requests.post(url, data=payload, headers=headers)
     content = response.json()
