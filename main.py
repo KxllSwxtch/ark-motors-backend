@@ -20,7 +20,7 @@ USER_AGENTS = [
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -45,9 +45,19 @@ def get_maker_list(country: str):
         "X-Requested-With": "XMLHttpRequest",
         "Connection": "keep-alive",
     }
-    response = requests.post(url, headers=headers, data=payload, proxies=PROXIES)
-    content = response.json()
-    return content.get("data", [])
+    try:
+        response = requests.post(url, headers=headers, data=payload, proxies=PROXIES)
+        if response.status_code == 200 and response.text:
+            content = response.json()
+            return content.get("data", [])
+        else:
+            print(
+                f"Error: Received status code {response.status_code} or empty response from get_maker_list"
+            )
+            return []
+    except Exception as e:
+        print(f"Error fetching maker list: {str(e)}")
+        return []
 
 
 def get_model_list(maker: str):
@@ -64,9 +74,19 @@ def get_model_list(maker: str):
         "X-Requested-With": "XMLHttpRequest",
         "Connection": "keep-alive",
     }
-    response = requests.post(url, headers=headers, data=payload, proxies=PROXIES)
-    content = response.json()
-    return content.get("data", [])
+    try:
+        response = requests.post(url, headers=headers, data=payload, proxies=PROXIES)
+        if response.status_code == 200 and response.text:
+            content = response.json()
+            return content.get("data", [])
+        else:
+            print(
+                f"Error: Received status code {response.status_code} or empty response from get_model_list"
+            )
+            return []
+    except Exception as e:
+        print(f"Error fetching model list: {str(e)}")
+        return []
 
 
 def get_detail_model_list(model: str):
@@ -83,9 +103,19 @@ def get_detail_model_list(model: str):
         "X-Requested-With": "XMLHttpRequest",
         "Connection": "keep-alive",
     }
-    response = requests.post(url, headers=headers, data=payload, proxies=PROXIES)
-    content = response.json()
-    return content.get("data", [])
+    try:
+        response = requests.post(url, headers=headers, data=payload, proxies=PROXIES)
+        if response.status_code == 200 and response.text:
+            content = response.json()
+            return content.get("data", [])
+        else:
+            print(
+                f"Error: Received status code {response.status_code} or empty response"
+            )
+            return []
+    except Exception as e:
+        print(f"Error fetching detail models: {str(e)}")
+        return []
 
 
 def get_grade_list(detail_model: str):
@@ -102,9 +132,19 @@ def get_grade_list(detail_model: str):
         "X-Requested-With": "XMLHttpRequest",
         "Connection": "keep-alive",
     }
-    response = requests.post(url, headers=headers, data=payload, proxies=PROXIES)
-    content = response.json()
-    return content.get("data", [])
+    try:
+        response = requests.post(url, headers=headers, data=payload, proxies=PROXIES)
+        if response.status_code == 200 and response.text:
+            content = response.json()
+            return content.get("data", [])
+        else:
+            print(
+                f"Error: Received status code {response.status_code} or empty response from get_grade_list"
+            )
+            return []
+    except Exception as e:
+        print(f"Error fetching grade list: {str(e)}")
+        return []
 
 
 def get_detail_grade_list(grade: str):
@@ -121,9 +161,19 @@ def get_detail_grade_list(grade: str):
         "X-Requested-With": "XMLHttpRequest",
         "Connection": "keep-alive",
     }
-    response = requests.post(url, headers=headers, data=payload, proxies=PROXIES)
-    content = response.json()
-    return content.get("data", [])
+    try:
+        response = requests.post(url, headers=headers, data=payload, proxies=PROXIES)
+        if response.status_code == 200 and response.text:
+            content = response.json()
+            return content.get("data", [])
+        else:
+            print(
+                f"Error: Received status code {response.status_code} or empty response from get_detail_grade_list"
+            )
+            return []
+    except Exception as e:
+        print(f"Error fetching detail grade list: {str(e)}")
+        return []
 
 
 def fetch_cars(
@@ -200,60 +250,75 @@ def fetch_cars(
         "Connection": "keep-alive",
     }
 
-    response = requests.get(base_url, headers=headers, params=params, proxies=PROXIES)
-    content = response.text
-
-    soup = BeautifulSoup(content, "html.parser")
-    car_elements = soup.select("li.car-detail.ul-car-detail")
-    cars = []
-
-    for el in car_elements:
-        # Извлекаем название автомобиля
-        name_elem = el.select_one(".car-name span a")
-        name = name_elem.get_text(strip=True) if name_elem else ""
-
-        # Извлекаем ссылку на изображение
-        car_img_elem = el.select_one(".car-img")
-        raw_image = ""
-        if car_img_elem and car_img_elem.has_attr("style"):
-            style_attr = car_img_elem["style"]
-            match = re.search(r"url\((.*?)\)", style_attr)
-            if match:
-                raw_image = match.group(1).strip("\"'")
-                raw_image = html.unescape(raw_image)
-
-        # Формируем ссылку на страницу автомобиля
-        link_elem = el.find("a")
-        link = ""
-        if link_elem and link_elem.has_attr("href"):
-            link = "https://www.arkmotors.kr" + link_elem["href"]
-
-        # Извлекаем данные (год, пробег, тип топлива, КПП)
-        car_options = el.select(".car-option li")
-        year = car_options[0].get_text(strip=True) if len(car_options) > 0 else ""
-        mileage = car_options[1].get_text(strip=True) if len(car_options) > 1 else ""
-        fuel_type = car_options[2].get_text(strip=True) if len(car_options) > 2 else ""
-        transmission = (
-            car_options[3].get_text(strip=True) if len(car_options) > 3 else ""
+    try:
+        response = requests.get(
+            base_url, headers=headers, params=params, proxies=PROXIES
         )
+        if response.status_code != 200 or not response.text:
+            print(
+                f"Error: Received status code {response.status_code} or empty response from fetch_cars"
+            )
+            return []
 
-        # Извлекаем цену
-        price_elem = el.select_one(".price .num")
-        price = (price_elem.get_text(strip=True) + "만원") if price_elem else ""
+        content = response.text
+        soup = BeautifulSoup(content, "html.parser")
+        car_elements = soup.select("li.car-detail.ul-car-detail")
+        cars = []
 
-        car = {
-            "name": name,
-            "image": raw_image,
-            "link": link,
-            "year": year,
-            "mileage": mileage,
-            "fuelType": fuel_type,
-            "transmission": transmission,
-            "price": price,
-        }
-        cars.append(car)
+        for el in car_elements:
+            # Извлекаем название автомобиля
+            name_elem = el.select_one(".car-name span a")
+            name = name_elem.get_text(strip=True) if name_elem else ""
 
-    return cars
+            # Извлекаем ссылку на изображение
+            car_img_elem = el.select_one(".car-img")
+            raw_image = ""
+            if car_img_elem and car_img_elem.has_attr("style"):
+                style_attr = car_img_elem["style"]
+                match = re.search(r"url\((.*?)\)", style_attr)
+                if match:
+                    raw_image = match.group(1).strip("\"'")
+                    raw_image = html.unescape(raw_image)
+
+            # Формируем ссылку на страницу автомобиля
+            link_elem = el.find("a")
+            link = ""
+            if link_elem and link_elem.has_attr("href"):
+                link = "https://www.arkmotors.kr" + link_elem["href"]
+
+            # Извлекаем данные (год, пробег, тип топлива, КПП)
+            car_options = el.select(".car-option li")
+            year = car_options[0].get_text(strip=True) if len(car_options) > 0 else ""
+            mileage = (
+                car_options[1].get_text(strip=True) if len(car_options) > 1 else ""
+            )
+            fuel_type = (
+                car_options[2].get_text(strip=True) if len(car_options) > 2 else ""
+            )
+            transmission = (
+                car_options[3].get_text(strip=True) if len(car_options) > 3 else ""
+            )
+
+            # Извлекаем цену
+            price_elem = el.select_one(".price .num")
+            price = (price_elem.get_text(strip=True) + "만원") if price_elem else ""
+
+            car = {
+                "name": name,
+                "image": raw_image,
+                "link": link,
+                "year": year,
+                "mileage": mileage,
+                "fuelType": fuel_type,
+                "transmission": transmission,
+                "price": price,
+            }
+            cars.append(car)
+
+        return cars
+    except Exception as e:
+        print(f"Error fetching cars: {str(e)}")
+        return []
 
 
 # Эндпоинты для получения списков
@@ -369,52 +434,68 @@ def car_details(carId: str = Query(..., description="ID автомобиля")):
         "Content-Type": "text/html; charset=UTF-8",
         "User-Agent": random.choice(USER_AGENTS),
     }
-    response = requests.get(url, headers=headers, proxies=PROXIES)
-    content = response.text
+    try:
+        response = requests.get(url, headers=headers, proxies=PROXIES)
+        if response.status_code != 200 or not response.text:
+            print(
+                f"Error: Received status code {response.status_code} or empty response from car_details"
+            )
+            return {"carName": "", "carData": {}, "carHistoryURL": ""}
 
-    soup = BeautifulSoup(content, "html.parser")
-    # Получаем название автомобиля
-    car_name_element = soup.select_one(".car_name p")
-    carName = car_name_element.text.strip() if car_name_element else ""
+        content = response.text
 
-    # Парсим таблицу с базовой информацией
-    basic_info = soup.select_one(".info_wrap .basic-info")
+        soup = BeautifulSoup(content, "html.parser")
+        # Получаем название автомобиля
+        car_name_element = soup.select_one(".car_name p")
+        carName = car_name_element.text.strip() if car_name_element else ""
 
-    car_info = {}
-    if basic_info:
-        rows = basic_info.find_all("tr")
-        for row in rows:
-            columns = row.find_all(["th", "td"])
-            if len(columns) == 4:
-                key1 = columns[0].get_text(strip=True)
-                value1 = columns[1].get_text(strip=True)
-                key2 = columns[2].get_text(strip=True)
-                value2 = columns[3].get_text(strip=True)
-                car_info[key1] = value1
-                car_info[key2] = value2
-            elif len(columns) == 2:
-                key = columns[0].get_text(strip=True)
-                value = columns[1].get_text(strip=True)
-                car_info[key] = value
+        # Парсим таблицу с базовой информацией
+        basic_info = soup.select_one(".info_wrap .basic-info")
 
-    # Удаляем ненужное поле, если оно присутствует
-    car_info.pop("사고유무", None)
+        car_info = {}
+        if basic_info:
+            rows = basic_info.find_all("tr")
+            for row in rows:
+                columns = row.find_all(["th", "td"])
+                if len(columns) == 4:
+                    key1 = columns[0].get_text(strip=True)
+                    value1 = columns[1].get_text(strip=True)
+                    key2 = columns[2].get_text(strip=True)
+                    value2 = columns[3].get_text(strip=True)
+                    car_info[key1] = value1
+                    car_info[key2] = value2
+                elif len(columns) == 2:
+                    key = columns[0].get_text(strip=True)
+                    value = columns[1].get_text(strip=True)
+                    car_info[key] = value
 
-    # Вытаскиываем цену автомобиля
-    car_price = soup.select_one(".car_right_side .car_price")
-    if car_price:
-        car_price = re.sub(r"\D", "", car_price.text)
-        car_price = int(car_price) * 10000
+        # Удаляем ненужное поле, если оно присутствует
+        car_info.pop("사고유무", None)
 
-    car_info["price"] = car_price
+        # Вытаскиываем цену автомобиля
+        car_price = soup.select_one(".car_right_side .car_price")
+        if car_price:
+            car_price = re.sub(r"\D", "", car_price.text)
+            car_price = int(car_price) * 10000
 
-    # Получаем ссылку на историю автомобиля
-    history_elem = soup.select_one("div#tab-add-option-info > div > a")
-    car_history_url = (
-        history_elem["href"] if history_elem and history_elem.has_attr("href") else ""
-    )
+        car_info["price"] = car_price
 
-    return {"carName": carName, "carData": car_info, "carHistoryURL": car_history_url}
+        # Получаем ссылку на историю автомобиля
+        history_elem = soup.select_one("div#tab-add-option-info > div > a")
+        car_history_url = (
+            history_elem["href"]
+            if history_elem and history_elem.has_attr("href")
+            else ""
+        )
+
+        return {
+            "carName": carName,
+            "carData": car_info,
+            "carHistoryURL": car_history_url,
+        }
+    except Exception as e:
+        print(f"Error fetching car details: {str(e)}")
+        return {"carName": "", "carData": {}, "carHistoryURL": ""}
 
 
 @app.get("/car-images")
@@ -432,10 +513,20 @@ def car_images(carId: str = Query(..., description="ID автомобиля")):
         "X-Requested-With": "XMLHttpRequest",
         "Connection": "keep-alive",
     }
-    response = requests.post(url, data=payload, headers=headers, proxies=PROXIES)
-    content = response.json()
-    images = [
-        {"full": img.get("CarImageFullName"), "thumb": img.get("CarImageThumb")}
-        for img in content.get("info", [])
-    ]
-    return {"images": images}
+    try:
+        response = requests.post(url, data=payload, headers=headers, proxies=PROXIES)
+        if response.status_code != 200 or not response.text:
+            print(
+                f"Error: Received status code {response.status_code} or empty response from car_images"
+            )
+            return {"images": []}
+
+        content = response.json()
+        images = [
+            {"full": img.get("CarImageFullName"), "thumb": img.get("CarImageThumb")}
+            for img in content.get("info", [])
+        ]
+        return {"images": images}
+    except Exception as e:
+        print(f"Error fetching car images: {str(e)}")
+        return {"images": []}
